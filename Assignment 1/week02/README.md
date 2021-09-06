@@ -4,35 +4,31 @@
 
 The goals of this lecture are:
 
-* Being able to use and reason about the monitors and semaphores.
+* Being able to use and reason about the monitors.
 * Being able to use the Java `synchronized` keyword.
-* To be completed.
+* Being able to reason about visibility in Java.
+* Being able to reason about reordering in Java.
+* Being able to use and reason about Java `volatile` variables.
 
 ## Readings 
 
-*Note: more readings may appear shortly, no readings will be removed; so you can start reading* 🙂
-
 * Goetz:
-  * To appear.
+  * Chapter 2, Sections 2.3 and 2.4. *(it was part of the readings for last week)*.
+  * Chapter 3, complete.
+  * Chapter 16, Section 16.1.2, Section 16.2.
   
 * Herlihy:
   * Chapter 8, complete.
   
-<!-- ### Optional readings -->
+### Optional readings
 
-<!-- * Dijkstra's paper introducing (and solving) the mutual exclusion problem. -->
-<!--   * E. W. Dijkstra. [Solution of a Problem in Concurrent  Programming  Control](https://dl-acm-org.ep.ituproxy.kb.dk/doi/pdf/10.1145/365559.365617). Communications of the ACM. Volume 8. Issue 9. 1965. -->
-
-<!-- * Lamport's paper introducing the _happened-before_ relation. -->
-<!--   * Leslie Lamport. [Time, Clocks, and the Ordering of Events in a Distributed System](https://www.microsoft.com/en-us/research/uploads/prod/2016/12/Time-Clocks-and-the-Ordering-of-Events-in-a-Distributed-System.pdf). Communications of the ACM. Volume 21. Issue 7. 1978. -->
-  
-<!-- * The proofs in Sections 2.1, 2.3 and 2.6 in Herlihy. -->
-
+* Sir Tony Hoare's paper introducing monitors.
+  * C. A. R. Hoare. [Monitors: an operating system structuring concept](https://dl-acm-org.ep.ituproxy.kb.dk/doi/pdf/10.1145/355620.361161). Communications of the ACM. Volume 17. Issue 10. 1974.
 
 ## Lecture slides
 
-To appear.
+See file [lecture02.pdf](lecture02.pdf).
 
-## Exercises
+### Exercises
 
-To appear.
+See file [exercises02.pdf](exercises02.pdf).
