@@ -1,0 +1,6 @@
+# OS:   Mac OS X; 11.5; x86_64
+# JVM:  Eclipse Foundation; 16.0.2
+# CPU:  Apple M1; 8 "cores"
+# Date: 2021-09-13T13:20:18+0200
+vctr                                  7,0 ns       0,05   67108864
+ctr                                   0,9 ns       0,01  268435456

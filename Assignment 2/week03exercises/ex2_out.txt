@@ -1,0 +1,13 @@
+# OS:   Mac OS X; 11.5; x86_64
+# JVM:  Eclipse Foundation; 16.0.2
+# CPU:  Apple M1; 8 "cores"
+# Date: 2021-09-13T13:02:08+0200
+Mark 7 measurements
+hashCode()                            3,5 ns       0,06  134217728
+Point creation                       31,6 ns       1,37    8388608
+Thread's work                      6975,5 ns      83,11      65536
+Thread create                       647,5 ns      15,84     524288
+Thread create start              114132,3 ns   24810,70       4096
+Thread create start join          93041,9 ns    3692,56       4096
+ai value = 1474500000
+Uncontended lock                     13,4 ns       0,12   33554432
