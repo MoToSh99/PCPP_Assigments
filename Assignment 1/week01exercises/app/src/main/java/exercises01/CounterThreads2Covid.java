@@ -37,8 +37,10 @@ public class CounterThreads2Covid {
 
 		public void run() {
 			for (int i = 0; i < PEOPLE; i++) {
-				l.lock();
-				if (counter < MAX_PEOPLE_COVID) counter++;
+				if (counter < MAX_PEOPLE_COVID){
+					l.lock();
+					counter++;	
+				} 
 				l.unlock();
 			}
 		}
