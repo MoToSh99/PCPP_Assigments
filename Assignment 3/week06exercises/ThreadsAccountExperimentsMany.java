@@ -1,28 +1,28 @@
 import java.util.Random;
+import java.util.concurrent.*;
 public class ThreadsAccountExperimentsMany {
 
   static final int N = 10; 
-  static final int NO_TRANSACTION=5;
+  static final int NO_TRANSACTION=10;
   static final int NO_THREADS = 10;
   static final Account[] accounts = new Account[N];
   static final Thread[] threads = new Thread[NO_THREADS];
   static Random rnd = new Random();
+  static ExecutorService pool = Executors.newFixedThreadPool(4);
+  static int counter;
   
   public static void main(String[] args){ new ThreadsAccountExperimentsMany(); }
 
   public ThreadsAccountExperimentsMany(){
+
     for( int i = 0; i < N; i++){
       accounts[i] = new Account(i);
     }
-    for( int i = 0; i<NO_THREADS; i++){
-      try{ (threads[i] = new Thread( () -> doNTransactions(NO_TRANSACTION) )).start();}
-      catch(Error ex){
-        System.out.println("At i = " + i + " I got error: " + ex);
-        System.exit(0);
-      }
+    for( int i = 0; i < N; i++){
+      doNTransactions(NO_TRANSACTION);
     }
-    for( int i = 0; i<NO_THREADS; i++){
-      try {threads[i].join();} catch(Exception dummy){};
+    if (isZero()) {
+      pool.shutdown();
     }
   }
   
@@ -37,7 +37,17 @@ public class ThreadsAccountExperimentsMany {
   
   private static void doTransaction(Transaction t){
     System.out.println(t);
-    t.transfer();
+    Runnable task = () -> {
+      try {
+        t.transfer();
+        System.out.println(pool);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    };
+    incr();
+    pool.execute(task);
+    decr();
   }
   
   static class Transaction {
@@ -75,5 +85,10 @@ public class ThreadsAccountExperimentsMany {
     public void withdraw(long sum){ balance -= sum; }
     public long getBalance(){ return balance; }
   }
+
+  static synchronized void incr() { counter++; }
+  static synchronized void decr() { counter--; }
+  static synchronized void reset() { counter = 1; }
+  static synchronized boolean isZero() { return counter == 0; }
 
 }

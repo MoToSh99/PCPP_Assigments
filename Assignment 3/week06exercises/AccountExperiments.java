@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.*;
 public class AccountExperiments {
   static final int N = 10; // Number of accounts
   static final int NO_TRANSACTION=5;
@@ -6,15 +7,37 @@ public class AccountExperiments {
   static final Account[] accounts = new Account[N];
   static final Random rnd = new Random();
 
-  public static void main(String[] args){ new AccountExperiments(); }
+  public static void main(String[] args){ 
+    new AccountExperiments(); 
+  }
    
   public AccountExperiments() { 
   // Create empty accounts
     for( int i = 0; i < N; i++){
       accounts[i] = new Account(i);
     }
-    //insert code using Mark7 to measure execution time
-    //...
+
+    int n = 10, count = 1;
+    double runningTime = 0.0, st = 0.0, sst = 0.0;
+    int transactions = 12;
+    System.out.println(transactions);
+    do { 
+      count *= 2;
+      st = sst = 0.0;
+      for (int j=0; j<n; j++) {
+        Timer t = new Timer();
+        for (int i=0; i<count; i++){
+          doNTransactions(12);
+        }
+        runningTime = t.check();
+        double time = runningTime * 1e9 / count;
+        st += time; 
+        sst += time * time;
+      }
+    } while (runningTime < 0.25 && count < Integer.MAX_VALUE/2);
+    double mean = st/n, sdev = Math.sqrt((sst - mean*mean*n)/(n-1));
+    System.out.printf("%-25s %15.1f ns %10.2f %10d%n", "Test", mean, sdev, count);
+    
   }
 
   private static double doNTransactions(int noTransactions){

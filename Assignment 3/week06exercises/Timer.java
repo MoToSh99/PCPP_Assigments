@@ -1,4 +1,3 @@
-package exercises03;
 // Crude wall clock timing utility, measuring time in seconds
    
 public class Timer {

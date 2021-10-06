@@ -5,20 +5,23 @@
 // modified jst@itu.dk 2021-09-24
 import java.util.function.IntToDoubleFunction;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.*;
 
 public class TestCountPrimesThreads {
+
   public static void main(String[] args) { new TestCountPrimesThreads(); }
 
   public TestCountPrimesThreads() {
     final int range = 100_000;
     Mark7("countSequential", i -> countSequential(range));
     for (int c=1; c<=32; c++) {
-    final int threadCount = c;
-    Mark7(String.format("countParallelN %2d", threadCount), 
-          i -> countParallelN(range, threadCount));
-    }
-    Mark7(String.format("countParallelNLocal %2d", threadCount), 
-          i -> countParallelNLocal(range, threadCount));
+      final int threadCount = c;
+      Mark7(String.format("countParallelN %2d", threadCount), 
+            i -> countParallelN(range, threadCount));
+      Mark7(String.format("countParallelNLocal %2d", threadCount), 
+            i -> countParallelNLocal(range, threadCount));
     }
   }
 
@@ -39,27 +42,29 @@ public class TestCountPrimesThreads {
     return count;
   }
 
+
+
   // General parallel solution, using multiple threads
   private static long countParallelN(int range, int threadCount) {
     final int perThread = range / threadCount;
     final LongCounter lc = new LongCounter();
-    Thread[] threads = new Thread[threadCount];
+    ExecutorService pool = Executors.newFixedThreadPool(threadCount);
+    List<Future<?>> futures = new ArrayList<Future<?>>();
     for (int t=0; t<threadCount; t++) {
-        final int from = perThread * t, 
-            to = (t+1==threadCount) ? range : perThread * (t+1); 
-        threads[t] = new Thread( () -> {
-                for (int i=from; i<to; i++)
-                    if (isPrime(i))
-                        lc.increment();
-            });
+      final int from = perThread * t, to = (t+1==threadCount) ? range : perThread * (t+1); 
+      futures.add(pool.submit(() -> {
+        for (int i=from; i<to; i++)
+          if (isPrime(i)) 
+            lc.increment();
+      })); 
     }
-    for (int t=0; t<threadCount; t++) 
-      threads[t].start();
+
     try {
-      for (int t=0; t<threadCount; t++) 
-        threads[t].join();
-        //System.out.println("Primes: "+lc.get());
-    } catch (InterruptedException exn) { }
+      for (Future<?> fut : futures)
+        fut.get();
+      pool.shutdown();
+    } catch (Exception e) { e.printStackTrace(); } 
+    
     return lc.get();
   }
 
@@ -67,28 +72,30 @@ public class TestCountPrimesThreads {
   private static long countParallelNLocal(int range, int threadCount) {
     final int perThread = range / threadCount;
     final long[] results = new long[threadCount];
-    Thread[] threads = new Thread[threadCount];
+    ExecutorService pool = Executors.newFixedThreadPool(threadCount);
+    List<Callable<Long>> tasks = new ArrayList<Callable<Long>>(); 
     for (int t=0; t<threadCount; t++) {
-      final int from = perThread * t, 
-        to = (t+1==threadCount) ? range : perThread * (t+1); 
+      final int from = perThread * t, to = (t+1==threadCount) ? range : perThread * (t+1); 
       final int threadNo = t;
-      threads[t] = new Thread( ()-> {
+      tasks.add(() -> { 
         long count = 0;
-        for (int i=from; i<to; i++)
+        for (int i=from; i<to; i++) {
           if (isPrime(i))
             count++;
-        results[threadNo] = count;
+        }
+        return count;
       });
     }
-    for (int t=0; t<threadCount; t++) 
-      threads[t].start();
-    try {
-      for (int t=0; t<threadCount; t++) 
-        threads[t].join();
-    } catch (InterruptedException exn) { }
+
     long result = 0;
-    for (int t=0; t<threadCount; t++) 
-      result += results[t];
+
+    try {
+      List<Future<Long>> futures = pool.invokeAll(tasks);
+      for (Future<Long> fut : futures)
+        result += fut.get(); 
+      pool.shutdown();
+    } catch (Exception e) { e.printStackTrace(); } 
+    
     return result;
   }
 
