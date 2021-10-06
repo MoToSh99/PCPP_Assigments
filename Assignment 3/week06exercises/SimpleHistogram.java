@@ -29,7 +29,7 @@ public class SimpleHistogram {
 				to = (t+1==threadCount) ? range : perThread * (t+1); 
 			threads[t] = new Thread( () -> {
 				for (int i=from; i<to; i++)
-					histogram.increment(countFactors(i));
+					histogram.increment(primeFactors(i));
 			});
 		}
 		for (int t=0; t<threadCount; t++) 
@@ -48,18 +48,20 @@ public class SimpleHistogram {
 		System.out.printf("      %9d%n", histogram.getTotal());
 	}
     
-    public static int countFactors(int p) {
-		if (p < 2)
+    public static int primeFactors(int n) {
+		if (n < 2)
 			return 0;
-		int factorCount = 1, k = 2;
-		while (p >= k * k) {
-			if (p % k == 0) {
-				factorCount++;
-				p /= k;
-			} else
+		int c = 1;
+		int k = 2;
+		while (k * k <= n) {
+			if (n % k != 0) {
 				k++;
+			} else {
+				c++;
+				n /= k;
+			}
 		}
-		return factorCount;
+		return c;
 	}
 }
 
