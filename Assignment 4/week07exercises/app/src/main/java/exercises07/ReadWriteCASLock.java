@@ -2,53 +2,146 @@
 // raup@itu.dk * 10/10/2021
 package exercises07;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
+
 class ReadWriteCASLock implements SimpleRWTryLockInterface {
 
     public static void main(String[] args) {
-	//TODO execute tests (7.2.5 & 7.2.6)
+        //runSequentialTests();
+        runParallelTests();
     }
 
-    // TODO: Add necessary field(s) for the class
+    private final AtomicReference<Holders> holders = new AtomicReference<Holders>();
 
     public boolean readerTryLock() {
-	// TODO 7.2.3
-	return true;
+        Thread current = Thread.currentThread();
+        Holders tmpHolders;
+        do {
+            tmpHolders = holders.get();
+            if (tmpHolders == null) {
+                return holders.compareAndSet(tmpHolders, new ReaderList(current, (ReaderList) tmpHolders));
+            }
+        } while (holders.get().getClass() == Writer.class);
+        return holders.compareAndSet(tmpHolders, new ReaderList(current, (ReaderList) tmpHolders));
     }
-    
+
     // Challenging 7.2.7: You may add new methods
 	
-    public void readerUnlock() {
-	// TODO 7.2.4
-    }
     
-    public boolean writerTryLock() {
-	// TODO 7.2.1
-	return true;
+    public void readerUnlock() { 
+        Thread current = Thread.currentThread();
+        Holders tmpHolders; 
+        do {
+            tmpHolders = holders.get();
+            if (tmpHolders == null || tmpHolders.getClass() == Writer.class || !((ReaderList) tmpHolders).contains(current)) {
+                System.out.println("Exception thrown");
+                throw new RuntimeException("Not lock holder");
+            }
+        } while(!holders.compareAndSet(tmpHolders, ((ReaderList) tmpHolders).remove(current)));
+    }
+
+    
+   public boolean writerTryLock() {
+        final Writer writer = new Writer(Thread.currentThread());
+        return holders.compareAndSet(null, writer);
     }
 
     public void writerUnlock() {
-	// TODO 7.2.2
+        Holders tmpHolders = holders.get();
+        if (!holders.compareAndSet(tmpHolders, null)) {
+            System.out.println("Exception thrown");
+            throw new RuntimeException("Not lock holder");
+        }
     }
-
-
 
     private static abstract class Holders { }
 
     private static class ReaderList extends Holders {
-	private final Thread thread;
-	private final ReaderList next;
+        private final Thread thread;
+        private final ReaderList next;
 
-	// TODO: Constructor
+        public ReaderList(Thread thread, ReaderList next) {
+            this.thread = thread;
+            this.next = next;
+        }
 
-	// TODO: contains
+        public boolean contains(Thread t) {
+            for (ReaderList current = this; current != null; current = current.next) {
+                if (thread == t) return true;
+            }
+            return false; 
+        }
 
-	// TODO: remove
+        public ReaderList remove(Thread t) {
+            if (t == thread) return next;
+            if (next == null) return this;
+            return new ReaderList(thread, remove(t, next));
+        }
+
+        private static ReaderList remove(Thread t, ReaderList current) {
+            if (current == null) return null;
+            if (t == current.thread) return current.next;
+            return new ReaderList(current.thread, remove(t, current.next));
+        }
     }
 
     private static class Writer extends Holders {
-	public final Thread thread;
+        public final Thread thread;
 
-	// TODO: Constructor
-	
+        public Writer(Thread thread) {
+            this.thread = thread;
+        }
     }
+
+public static void runSequentialTests() {
+    ReadWriteCASLock lock = new ReadWriteCASLock();
+    for (int i = 0; i < 5; i++) {
+        Boolean b1 = lock.readerTryLock();
+        System.out.println("Reader lock (should be true): " + b1);
+        Boolean b2 = lock.writerTryLock();
+        System.out.println("Writer lock (should be false): " + b2);
+    }
+
+    for (int i = 0; i < 5; i++) {
+        lock.readerUnlock();
+    }
+
+    for (int i = 0; i < 5; i++) {
+        Boolean b1 = lock.writerTryLock();
+        System.out.println("Writer lock (should be true): " + b1);
+        lock.writerUnlock();
+    }
+}
+
+public static void runParallelTests() {
+    ReadWriteCASLock lock = new ReadWriteCASLock();
+    ExecutorService exec = Executors.newFixedThreadPool(10);
+    exec.execute( () -> { 
+        try { 
+            Boolean b1 =  lock.writerTryLock();
+            Thread.sleep(1000);
+            lock.writerUnlock();
+        }
+        catch (Exception e) {}
+    }); 
+    Runnable runnable = () -> { 
+        try { 
+            Boolean b1 = lock.writerTryLock();
+            lock.writerUnlock();
+            Boolean b2 = lock.readerTryLock();
+            lock.readerUnlock();
+            System.out.println(b1 + " + " + b2);
+        }
+        catch (Exception e) {}
+    }; 
+
+    for (int i = 0; i < 10; i++)  {
+        exec.execute(runnable);
+    }
+    exec.shutdown();
+}
+
+
 }
