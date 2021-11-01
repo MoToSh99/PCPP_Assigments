@@ -22,8 +22,7 @@ public static void main(String[] args) {  new StopwatchRx(); }
 		f.setBounds(0, 0, 220, 220); 
     myUI= new stopwatchUI(0, f);
  
-    //TO DO
-    //Insert code using timer and display to make a working version of the Stopwatch
+    timer.subscribe(display);
     
     f.setLayout(null);  
 		f.setVisible(true);   
@@ -31,23 +30,23 @@ public static void main(String[] args) {  new StopwatchRx(); }
  
   //Observable simulating clock ticking every second
   final Observable<Integer> timer= Observable.create(new ObservableOnSubscribe<Integer>() {
-      @Override
-      public void subscribe(ObservableEmitter<Integer> e) throws Exception {
-        new Thread() {
-          @Override
-          public void run() {
-            try {
-              while ( true ) {
-                TimeUnit.SECONDS.sleep(1);
-                e.onNext(1);
-              }
-            } catch (java.lang.InterruptedException e) {
-              System.out.println(e.toString());
+    @Override
+    public void subscribe(ObservableEmitter<Integer> e) throws Exception {
+      new Thread() {
+        @Override
+        public void run() {
+          try {
+            while ( true ) {
+              TimeUnit.SECONDS.sleep(1);
+              e.onNext(1);
             }
+          } catch (java.lang.InterruptedException e) {
+            System.out.println(e.toString());
           }
-        }.start();
-      }
-  });
+        }
+      }.start();
+    }
+});
 
   // Observer updating the display
   final Observer<Integer> display= new Observer<Integer>() {

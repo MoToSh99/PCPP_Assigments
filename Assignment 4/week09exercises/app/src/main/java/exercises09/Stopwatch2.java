@@ -8,13 +8,14 @@ import java.util.concurrent.TimeUnit;
    http://shop.oreilly.com/product/0636920029045.do
    Modified to Java, October 7, 2021 by Jørgen Staunstrup, ITU, jst@itu.dk */
 
-public class Stopwatch {
-  public static void main(String[] args) { new Stopwatch(); }
+public class Stopwatch2 {
+  public static void main(String[] args) { new Stopwatch2(); }
 
-  public Stopwatch() {
+  public Stopwatch2() {
     final JFrame f= new JFrame("Stopwatch"); 
     final stopwatchUI myUI= new stopwatchUI(0, f);
-    f.setBounds(0, 0, 220, 220); 
+	final stopwatchUI myUI1= new stopwatchUI(200, f);
+    f.setBounds(0, 0, 220*2, 220); 
     f.setLayout(null);  
     f.setVisible(true); 
 
@@ -28,6 +29,20 @@ public class Stopwatch {
           while ( true ) {
             TimeUnit.MILLISECONDS.sleep(100);
             myUI.updateTime();
+        }
+		    } catch (java.lang.InterruptedException e) { System.out.println(e.toString());   }
+      }
+	  }.start();
+
+      new Thread() {
+      private int seconds= 0;
+
+      @Override
+      public void run() {
+		    try {
+          while ( true ) {
+            TimeUnit.MILLISECONDS.sleep(100);
+            myUI1.updateTime();
         }
 		    } catch (java.lang.InterruptedException e) { System.out.println(e.toString());   }
       }
