@@ -14,7 +14,7 @@ public class TestWordStream {
   public static void main(String[] args) {
     String filename = "src/main/resources/english-words.txt";
     //Exercise 1
-    System.out.println(readWords(filename).count());
+/*     System.out.println(readWords(filename).count());
 
     //Exercise 2
     readWords(filename).limit(100).forEach(System.out::println);
@@ -24,8 +24,8 @@ public class TestWordStream {
 
     //Exercise 4
     readWords(filename).filter(x -> x.length() > 21).limit(1).forEach(System.out::println);
-
-    //Exercise 5
+ */
+  /*   //Exercise 5
     long startTime1 = System.nanoTime();
     readWords(filename).filter(x -> isPalindrome(x)).forEach(System.out::println);
     long endTime1 = System.nanoTime();
@@ -37,8 +37,8 @@ public class TestWordStream {
     long endTime = System.nanoTime();
     long duration = (endTime - startTime)/1000000;
     System.out.println(duration1);
-    System.out.println(duration);
-    
+    System.out.println(duration); */
+    /* 
     //Exercise 7
     System.out.println(readWords(filename).mapToInt(x -> x.length()).min());
     System.out.println(readWords(filename).mapToInt(x -> x.length()).max());
@@ -49,10 +49,10 @@ public class TestWordStream {
     
     //Exercise 9
     readWords(filename).map(x -> letters(x)).limit(100).forEach(System.out::println);
-
+*/
     //Exercise 10
     System.out.println(readWords(filename).map(x -> letters(x).get('e')).filter(x -> x != null).reduce(0, (a, b) -> a + b));
-  }
+}
 
   public static Stream<String> readWords(String filename) {
     try {
