@@ -8,24 +8,24 @@ public class Main {
 
     public static void main(String[] args) {
     
-	// actor system
-	// To be implemented
+		// actor system
+		final ActorSystem<SystemGuardian.KickOff> guardian = ActorSystem.create(SystemGuardian.create(), "mobilepayment_system");
 
-	// init message
-	// To be implemented
+		// init message
+		guardian.tell(new SystemGuardian.KickOff());
 
-	// wait until user presses enter
-	try {
-	    System.out.println(">>> Press ENTER to exit <<<");
-	    System.in.read();
-	}
-	catch (IOException e) {
-	    System.out.println("Error " + e.getMessage());
-	    e.printStackTrace();
-	} finally {
-	    // terminate actor system execution
-	    // To be implemented
-	}
+		// wait until user presses enter
+		try {
+			System.out.println(">>> Press ENTER to exit <<<");
+			System.in.read();
+		}
+		catch (IOException e) {
+			System.out.println("Error " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			// terminate actor system execution
+			guardian.terminate();
+		}
     
     }
     

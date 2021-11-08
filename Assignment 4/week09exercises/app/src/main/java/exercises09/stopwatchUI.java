@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 // User interfaca for Stopwatch, October 7, 2021 by Jørgen Staunstrup, ITU, jst@itu.dk
 
 class stopwatchUI {
-  final private String allzero = "0:00:00";
+  final private String allzero = "0:00:00:00";
   private int lx;
   private static JFrame lf;
   private SecCounter lC;
@@ -21,10 +21,11 @@ class stopwatchUI {
     synchronized(this) {
       if ( lC.incr() ) {
         int seconds= lC.seconds;
-        int hours= seconds/3600;
-        int minutes= (seconds%3600)/60;
-        int secs= seconds%60;
-        String time= String.format(Locale.getDefault(),	"%d:%02d:%02d", hours, minutes, secs);
+        int hours= seconds / 10 / 60 / 60;
+        int minutes= (seconds / 10 / 60) % 60;
+        int secs= (seconds / 10) % 60;
+        int milli= seconds%10;
+        String time= String.format(Locale.getDefault(),	"%d:%02d:%02d:%02d", hours, minutes, secs, milli);
         tf.setText(time);
       }
     }
@@ -35,7 +36,7 @@ class stopwatchUI {
   
   public stopwatchUI(int x, JFrame jF){
     lx= x+50; lf= jF;	
-    tf.setBounds(lx, 10, 60, 20); 
+    tf.setBounds(lx, 10, 80, 20); 
     tf.setText(allzero);
 
     lC= new SecCounter(0, false);

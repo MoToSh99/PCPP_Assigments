@@ -26,11 +26,13 @@ public class Stopwatch {
       public void run() {
 		    try {
           while ( true ) {
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.MILLISECONDS.sleep(100);
             myUI.updateTime();
         }
 		    } catch (java.lang.InterruptedException e) { System.out.println(e.toString());   }
       }
 	  }.start();
   }
+
+  
 }

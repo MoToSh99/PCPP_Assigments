@@ -4,28 +4,48 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
 
-public class Account extends AbstractBehavior</*To be Implemented*/> {
+public class Account extends AbstractBehavior<Account.BankMessage> {
 
     /* --- Messages ------------------------------------- */
-    // To be Implemented
-    
+    public interface BankMessage { }
+
+    public static final class DepositMessage implements BankMessage {
+        public final int value;
+
+        public DepositMessage(int value) {
+            this.value = value;
+        }
+    }
 
     /* --- State ---------------------------------------- */
-    // To be Implemented
-    
+    private int balance;
 
     /* --- Constructor ---------------------------------- */
-    // To be Implemented
-    
+    private Account(ActorContext<BankMessage> context) {
+        super(context);
+        this.balance = 0;
+        
+    }
 
     /* --- Actor initial behavior ----------------------- */
-    // To be Implemented
-    
+    public static Behavior<BankMessage> create() {
+        return Behaviors.setup(Account::new);
+    }
 
     /* --- Message handling ----------------------------- */
-    // To be Implemented
+    @Override
+    public Receive<BankMessage> createReceive() {
+	return newReceiveBuilder()
+	    .onMessage(DepositMessage.class, this::deposit)
+	    .build();
+    }
     
-
     /* --- Handlers ------------------------------------- */
-    // To be Implemented
+    public Behavior<BankMessage> deposit(DepositMessage msg) {
+        getContext().getLog().info("{}: Deposited {}",
+                       getContext().getSelf().path().name(),
+                       msg.value);
+        this.balance += msg.value;
+        return this;
+    }
 }
