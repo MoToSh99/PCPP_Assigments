@@ -9,50 +9,68 @@ import java.util.concurrent.atomic.AtomicReference;
 class ReadWriteCASLock implements SimpleRWTryLockInterface {
 
     public static void main(String[] args) {
-        //runSequentialTests();
+        runSequentialTests();
         runParallelTests();
     }
 
     private final AtomicReference<Holders> holders = new AtomicReference<Holders>();
 
     public boolean readerTryLock() {
-        Thread current = Thread.currentThread();
+        final Thread current = Thread.currentThread();
         Holders tmpHolders;
         do {
             tmpHolders = holders.get();
             if (tmpHolders == null) {
+                return holders.compareAndSet(null, new ReaderList(current, (ReaderList) tmpHolders));
+            } else if (tmpHolders.getClass() == ReaderList.class) {
                 return holders.compareAndSet(tmpHolders, new ReaderList(current, (ReaderList) tmpHolders));
             }
-        } while (holders.get().getClass() != Writer.class);
-        return holders.compareAndSet(tmpHolders, new ReaderList(current, (ReaderList) tmpHolders));
+        } while (tmpHolders == null || tmpHolders.getClass() == ReaderList.class);
+        return false;
     }
 
     // Challenging 7.2.7: You may add new methods
 	
     
     public void readerUnlock() { 
-        Thread current = Thread.currentThread();
-        Holders tmpHolders; 
-        do {
-            tmpHolders = holders.get();
-            if (tmpHolders == null || tmpHolders.getClass() == Writer.class || !((ReaderList) tmpHolders).contains(current)) {
-                System.out.println("Exception thrown");
-                throw new RuntimeException("Not lock holder");
-            }
-        } while(!holders.compareAndSet(tmpHolders, ((ReaderList) tmpHolders).remove(current)));
+        final Thread currentThread = Thread.currentThread();
+        ReaderList tmpHolders = (ReaderList) holders.get();
+        if (tmpHolders == null) {
+            throw new RuntimeException("The lock is not held.");
+        }
+        if (tmpHolders.contains(currentThread)) {
+            holders.compareAndSet(tmpHolders, tmpHolders.remove(currentThread));
+            return;
+        } else {
+            throw new RuntimeException("The lock is not held by this reader.");
+        }
     }
 
     
    public boolean writerTryLock() {
-        final Writer writer = new Writer(Thread.currentThread());
-        return holders.compareAndSet(null, writer);
+        final Thread currentThread = Thread.currentThread();
+        final Writer writer = new Writer(currentThread);
+        if (holders.get() == null) {
+            Holders tmpHolders = holders.get();
+            while (!holders.compareAndSet(tmpHolders, writer)) {
+                tmpHolders = holders.get();
+            }
+            return true;
+        }
+        return false;
     }
 
     public void writerUnlock() {
-        Holders tmpHolders = holders.get();
-        if (!holders.compareAndSet(tmpHolders, null)) {
-            System.out.println("Exception thrown");
-            throw new RuntimeException("Not lock holder");
+        final Thread currentThread = Thread.currentThread();
+        if (holders.get() == null) {
+            throw new RuntimeException("The lock is not held.");
+        }
+        Writer tmpHolders = (Writer) holders.get();
+        if (tmpHolders.thread == currentThread) {
+            holders.compareAndSet(tmpHolders, null);
+            return;
+        } else {
+            throw new RuntimeException("The lock is not held by this writer.");
         }
     }
 
@@ -85,6 +103,7 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
             if (t == current.thread) return current.next;
             return new ReaderList(current.thread, remove(t, current.next));
         }
+
     }
 
     private static class Writer extends Holders {

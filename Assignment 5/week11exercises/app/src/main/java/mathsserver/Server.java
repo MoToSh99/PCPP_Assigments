@@ -41,7 +41,11 @@ public class Server extends AbstractBehavior<Server.ServerCommand> {
     }
     
     /* --- State ---------------------------------------- */
-    // To be implemented
+	List<Task> pendingTasks;
+	List<ActorRef<Client.ClientCommand>> busyWorkers;
+	List<ActorRef<Client.ClientCommand>> idleWorkers;
+	int minWorkers;
+	int maxWorkers;
     
     
 
@@ -49,8 +53,12 @@ public class Server extends AbstractBehavior<Server.ServerCommand> {
     private Server(ActorContext<ServerCommand> context,
 		   int minWorkers, int maxWorkers) {
     	super(context);
-	// To be implemented
-	
+	this.minWorkers = minWorkers;
+	this.maxWorkers = maxWorkers;
+	this.pendingTasks = new LinkedList<Task>();
+	this.pendingTasks = new LinkedList<Task>();
+	this.busyWorkers = new LinkedList<ActorRef<Client.ClientCommand>>();
+	this.idleWorkers = new LinkedList<ActorRef<Client.ClientCommand>>();
     }
 
 
