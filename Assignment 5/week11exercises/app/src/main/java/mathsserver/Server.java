@@ -9,15 +9,11 @@ import akka.actor.typed.ChildFailed;
 import akka.actor.typed.Terminated;
 import akka.actor.typed.javadsl.*;
 
-import java.util.Queue;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.stream.IntStream;
-
-import mathsserver.Task;
-import mathsserver.Task.BinaryOperation;
 
 public class Server extends AbstractBehavior<Server.ServerCommand> {
     /* --- Messages ------------------------------------- */
@@ -170,9 +166,13 @@ public class Server extends AbstractBehavior<Server.ServerCommand> {
 			ComputeTask ct = ((LinkedList<ComputeTask>) pendingTasks).removeFirst();
 			msg.worker.tell(new Worker.ComputeTask(ct.task, ct.client));
 		}
-		else {
+		else if (idleWorkers.size() < minWorkers) {
 			busyWorkers.remove(msg.worker);
 			idleWorkers.add(msg.worker);
+		}
+		else{
+			busyWorkers.remove(msg.worker);
+			msg.worker.tell(new Worker.Stop());
 		}
 	return this;	
     }
