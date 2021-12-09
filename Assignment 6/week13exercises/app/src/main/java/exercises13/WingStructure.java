@@ -6,19 +6,22 @@ class WingStructure{
   private int iNull;
 
   public WingStructure(int size, int iNull){ 
-    items= new int[size]; 
-    for (int j= 0; j<size; j++) items[j]= iNull;
-    this.iNull= iNull;
-    back= 0;
+    items = new int[size]; 
+    for (int j = 0; j<size; j++) items[j] = iNull;
+    this.iNull = iNull;
+    back = 0;
   }
 
   public synchronized int INC(){
-  //TO DO implement
-   
+    int old = this.back;
+    this.back = this.back + 1 % this.items.length;
+    return old;
   }
+
   public synchronized int SWAP(int i){
-  //TO DO implement
-    
+    int old = items[i];
+    items[i] = this.iNull;
+    return old;
   }
 
   public synchronized int READ() {
@@ -26,6 +29,6 @@ class WingStructure{
   }
 
   public synchronized void STORE(int i, int x) {
-    items[i]= x;
+    items[i] = x;
   }
 }
