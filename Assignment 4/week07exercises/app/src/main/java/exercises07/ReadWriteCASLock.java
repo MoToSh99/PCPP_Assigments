@@ -52,7 +52,7 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
 
     public void writerUnlock() {
         final Writer holder = (Writer) holders.get();
-        if (holder == null || holder.thread == Thread.currentThread()) {
+        if (holder == null || holder.thread != Thread.currentThread()) {
             throw new RuntimeException("Lock is not held by thread.");
         } else {
             holders.compareAndSet(holder, null);
