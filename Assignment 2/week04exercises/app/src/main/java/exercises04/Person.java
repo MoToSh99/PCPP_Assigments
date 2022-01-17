@@ -4,17 +4,20 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Person {
 
     private final long id;
-    private String name;
+    private final String name;
     private int zip;
     private String address;
     private static AtomicLong idCounter = new AtomicLong(-1);
 
-    public Person() {
+    public Person(String name) {
+        this.name = name;
         idCounter.getAndIncrement();        
         this.id = idCounter.get();
     }
 
-    public Person(long id) {
+    public Person(String name, long id) {
+        this.name = name;
+
         if (idCounter.get() == -1) {
             Person.idCounter.set(id);
             this.id = id;
@@ -29,11 +32,11 @@ public class Person {
         this.address = address;
     }
 
-    public synchronized long getId() {
+    public long getId() {
         return id;
     }
 
-    public synchronized String getName() {
+    public String getName() {
         return name;
     }
 
@@ -48,9 +51,10 @@ public class Person {
     public static void main(String[] args) throws InterruptedException {
 
         for (int i = 0; i < 123; i++) {
+            int I = i;
             new Thread(() -> {
                 try {
-                    Person m = new Person();
+                    Person m = new Person("Hans" + I );
                     System.out.println(m.getId());
                 } catch (Exception e) {
                     e.printStackTrace();
