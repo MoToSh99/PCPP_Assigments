@@ -14,7 +14,7 @@ public class TestWordStream {
   public static void main(String[] args) {
     String filename = "src/main/resources/english-words.txt";
     //Exercise 1
-/*     System.out.println(readWords(filename).count());
+/*   System.out.println(readWords(filename).count());
 
     //Exercise 2
     readWords(filename).limit(100).forEach(System.out::println);

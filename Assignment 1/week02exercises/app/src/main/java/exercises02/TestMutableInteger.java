@@ -31,7 +31,7 @@ public class TestMutableInteger {
 
 class MutableInteger {
 	// WARNING: Not ready for usage by concurrent programs
-	volatile int value = 0;
+	private volatile int value = 0;
 
 	public void set(int value) {
 		this.value = value;

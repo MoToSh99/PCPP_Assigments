@@ -35,10 +35,10 @@ public class TestLongCounterExperiments {
 
     class LongCounter {
 	private long count = 0;    
-	Lock l = new ReentrantLock();
+	Lock l = new ReentrantLock();  	// CHANGES: Added a lock
     
 	public void increment() {
-		l.lock();
+		l.lock(); 
 	    count += 1;
 		l.unlock();
 	}

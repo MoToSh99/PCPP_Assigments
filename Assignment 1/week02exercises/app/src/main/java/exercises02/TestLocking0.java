@@ -8,14 +8,14 @@ import java.util.concurrent.locks.ReentrantLock;
 public class TestLocking0 {
 	public static void main(String[] args) {
 		final int count = 1_000_000;
-		NewMystery m = new NewMystery();
+		Mystery m = new Mystery();
 		Thread t1 = new Thread(() -> {
 			for (int i = 0; i < count; i++)
-				m.addInstance(1);
+				m.addStatic(1);
 		});
 		Thread t2 = new Thread(() -> {
 			for (int i = 0; i < count; i++)
-				m.addStatic(1);
+				m.addInstance(1);
 		});
 		t1.start();
 		t2.start();
@@ -31,6 +31,7 @@ public class TestLocking0 {
 class Mystery {
 	private static double sum = 0;
 
+	
 	public static synchronized void addStatic(double x) {
 		sum += x;
 	}

@@ -35,7 +35,7 @@ public class TestPrint {
 	}
 
 	class Printer {
-		Lock l = new ReentrantLock();
+		Lock l = new ReentrantLock(); 	// CHANGES: Added a lock
 
 		public void print() {
 			l.lock();

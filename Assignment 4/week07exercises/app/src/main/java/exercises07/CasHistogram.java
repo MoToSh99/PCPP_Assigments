@@ -2,7 +2,7 @@ package exercises07;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class CasHistogram implements Histogram {
-    private AtomicInteger[] counts;
+    final AtomicInteger[] counts;
 
     public CasHistogram(int span) {
         this.counts = new AtomicInteger[span];

@@ -33,16 +33,20 @@ public class CounterThreads2Covid {
 	}
 
 	public class Turnstile extends Thread {
-		Lock l = new ReentrantLock();
+		Lock l = new ReentrantLock(); 	// CHANGES: Added a lock
 
 		public void run() {
 			for (int i = 0; i < PEOPLE; i++) {
-				if (counter < MAX_PEOPLE_COVID){
-					l.lock();
-					counter++;	
-				} 
-				l.unlock();
-			}
+                l.lock();
+                try {
+                    // Critical section begin
+                    if (counter < MAX_PEOPLE_COVID) {
+                        counter++;
+                    }
+                    // Critical section end
+                } finally {
+                    l.unlock();
+                }
 		}
 	}
 }

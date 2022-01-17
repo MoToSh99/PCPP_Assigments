@@ -29,7 +29,7 @@ public static void main(String[] args) {  new StopwatchRx(); }
 	}
  
   //Observable simulating clock ticking every second
-  final Observable<Integer> timer= Observable.create(new ObservableOnSubscribe<Integer>() {
+  final Observable<Integer> timer = Observable.create(new ObservableOnSubscribe<Integer>() {
     @Override
     public void subscribe(ObservableEmitter<Integer> e) throws Exception {
       new Thread() {
