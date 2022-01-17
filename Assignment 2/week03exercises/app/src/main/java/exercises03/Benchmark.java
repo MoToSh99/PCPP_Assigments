@@ -193,14 +193,14 @@ class Benchmark {
       new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(now));
   }
 
-  public static void Mark0() {         // USELESS
+  public static void Mark0() {         // USELESS: Runs only once.
     Timer t = new Timer();
     double dummy = multiply(10);
     double time = t.check() * 1e9;
     System.out.printf("%6.1f ns%n", time);
   }
 
-  public static void Mark1() {         // NEARLY USELESS
+  public static void Mark1() {         // NEARLY USELESS: Runs more times.
     Timer t = new Timer();
     int count = 20000_000;
     for (int i=0; i<count; i++) {
@@ -210,7 +210,7 @@ class Benchmark {
     System.out.printf("%6.3f s  %6.1fns %n", time, time*1e9/count);
   }
 
-  public static double Mark2() {
+  public static double Mark2() {       // Avoids dead code elimination by returning dummy
     Timer t = new Timer();
     int count = 100_000_000;
     double dummy = 0.0;
@@ -221,7 +221,7 @@ class Benchmark {
     return dummy;
   }
 
-  public static double Mark3() {
+  public static double Mark3() {        // Does multiple runs
     int n = 10;
     int count = 100_000_000;
     double dummy = 0.0;
@@ -235,7 +235,7 @@ class Benchmark {
     return dummy / n;
   }
 
-  public static double Mark4() {
+  public static double Mark4() {        // Computes standard deviation
     int n = 10;
     int count = 100_000_000;
     double dummy = 0.0;
@@ -253,7 +253,7 @@ class Benchmark {
     return dummy / n;
   }
 
-  public static double Mark5() {
+  public static double Mark5() {          // Chooses iteration count automatically
     int n = 10, count = 1, totalCount = 0;
     double dummy = 0.0, runningTime = 0.0, st = 0.0, sst = 0.0;
     do {
@@ -275,7 +275,7 @@ class Benchmark {
     return dummy / totalCount;
   }
 
-  public static double Mark6(String msg, IntToDoubleFunction f) {
+  public static double Mark6(String msg, IntToDoubleFunction f) {         // Smarter code; custom function
     int n = 10, count = 1, totalCount = 0;
     double dummy = 0.0, runningTime = 0.0, st = 0.0, sst = 0.0;
     do { 
@@ -297,7 +297,7 @@ class Benchmark {
     return dummy / totalCount;
   }
 
-  public static double Mark7(String msg, IntToDoubleFunction f) {
+  public static double Mark7(String msg, IntToDoubleFunction f) {       // Different kinds of computations; prints final measurement
     int n = 10, count = 1, totalCount = 0;
     double dummy = 0.0, runningTime = 0.0, st = 0.0, sst = 0.0;
     do { 
@@ -320,7 +320,7 @@ class Benchmark {
   }
 
   public static double Mark8(String msg, String info, IntToDoubleFunction f, 
-                             int n, double minTime) {
+                             int n, double minTime) {                         // Problem size parameters
     int count = 1, totalCount = 0;
     double dummy = 0.0, runningTime = 0.0, st = 0.0, sst = 0.0;
     do { 
